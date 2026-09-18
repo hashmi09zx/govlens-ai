@@ -286,6 +286,11 @@ def request_change(job_id: str, payload: RequestChangeInput, background_tasks: B
     request_id = str(uuid.uuid4())
     rec_id = job.recruitment_id or job_id
 
+    # Update job status so frontend polling tracks re-research progress
+    job.status = "running"
+    job.current_step = "request_agent"
+    db.commit()
+
     user_req = UserRequestModel(
         id=request_id,
         recruitment_id=rec_id,
@@ -313,6 +318,17 @@ def request_change(job_id: str, payload: RequestChangeInput, background_tasks: B
 
             # Resume graph at request_agent node
             final_state = research_graph.invoke(updated_state, config=config)
+
+            job_rec = db_inner.query(JobModel).filter(JobModel.id == job_id).first()
+            res_status = final_state.get("research_status", {})
+
+            if res_status.get("recruitment_id") == "ambiguous" and job_rec:
+                job_rec.status = "ambiguous"
+                job_rec.current_step = "recruitment_id_agent"
+                job_rec.candidates_json = json.dumps(final_state.get("candidates", []))
+                db_inner.commit()
+                return
+
             affected_sections = final_state.get("affected_sections", [])
             new_report_dict = final_state.get("report", {})
 
@@ -329,10 +345,19 @@ def request_change(job_id: str, payload: RequestChangeInput, background_tasks: B
                 sections_json=json.dumps(new_report_dict),
             )
             db_inner.add(db_new_report)
+
+            if job_rec:
+                job_rec.status = "completed"
+                job_rec.current_step = "completed"
             db_inner.commit()
 
         except Exception as e:
             logger.error(f"Error executing HITL request for job {job_id}: {e}")
+            job_rec = db_inner.query(JobModel).filter(JobModel.id == job_id).first()
+            if job_rec:
+                job_rec.status = "failed"
+                job_rec.error = str(e)
+                db_inner.commit()
         finally:
             db_inner.close()
 

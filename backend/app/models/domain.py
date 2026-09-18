@@ -33,8 +33,8 @@ def classify_source_authority(url: str, title: str = "", snippet: str = "") -> D
 
     # Official domain check
     official_domains = [
-        ".gov.in", ".nic.in", "bpsc.bihar.gov.in", "bpsc", "ssc.gov.in", "upsc.gov.in",
-        "rrb", "ibps.in", "nta.ac.in", "cbse.gov.in", "sbi.co.in", "rbi.org.in"
+        ".gov.in", ".nic.in", "bpsc.bihar.gov.in", "ssc.gov.in", "upsc.gov.in",
+        "ibps.in", "nta.ac.in", "cbse.gov.in", "sbi.co.in", "rbi.org.in"
     ]
     is_official_domain = any(domain in low_url for domain in official_domains)
 

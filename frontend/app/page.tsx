@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface Candidate {
   id: string;
@@ -179,13 +179,8 @@ export default function Home() {
         body: JSON.stringify({ request_text: changeRequestText }),
       });
       setChangeRequestText("");
-      alert("Change request submitted! Re-research in progress...");
-      setTimeout(() => {
-        if (jobId) {
-          fetchReport(jobId);
-          fetchVersions(jobId);
-        }
-      }, 4000);
+      setJobStatus("running");
+      setCurrentStep("request_agent");
     } catch (err) {
       alert("Error submitting request change");
     } finally {
