@@ -1,12 +1,15 @@
 FROM python:3.12-slim
 
-# Install system dependencies for WeasyPrint & C libraries
+# Install system dependencies for WeasyPrint & C libraries on Debian
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     python3-dev \
-    cairo \
-    pango1.0-tools \
-    libgdk-pixbuf2.0-0 \
+    python3-cffi \
+    python3-brotli \
+    libcairo2 \
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
+    libharfbuzz-subset0 \
     libffi-dev \
     shared-mime-info \
     fonts-liberation \
