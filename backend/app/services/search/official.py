@@ -2,9 +2,6 @@ import os
 from typing import List
 from app.services.search.base import SearchProvider
 from app.services.search.duckduckgo_provider import DuckDuckGoSearchProvider
-from app.models.domain import SourceItem
-
-
 from app.models.domain import SourceItem, classify_source_authority
 
 

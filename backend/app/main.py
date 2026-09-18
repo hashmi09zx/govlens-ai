@@ -16,7 +16,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("main")
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Security Fail Fast Check
