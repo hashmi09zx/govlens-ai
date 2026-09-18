@@ -23,11 +23,14 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Copy dependency configs
 COPY pyproject.toml uv.lock ./
 
-# Install python dependencies without dev dependencies
-RUN uv sync --frozen --no-dev --no-cache
+# Install third-party python dependencies without attempting to build root project package yet
+RUN uv sync --frozen --no-dev --no-install-project --no-cache
 
-# Copy project files
+# Copy project source code (including src/ and app/)
 COPY . .
+
+# Complete sync to install project package
+RUN uv sync --frozen --no-dev --no-cache
 
 # Expose backend port
 EXPOSE 8000
